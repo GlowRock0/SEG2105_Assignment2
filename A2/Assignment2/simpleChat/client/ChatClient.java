@@ -27,6 +27,7 @@ public class ChatClient extends AbstractClient
    * the display method in the client.
    */
   ChatIF clientUI; 
+  String loginID;
 
   
   //Constructors ****************************************************
@@ -39,11 +40,12 @@ public class ChatClient extends AbstractClient
    * @param clientUI The interface type variable.
    */
   
-  public ChatClient(String host, int port, ChatIF clientUI) 
+  public ChatClient(String host, int port, ChatIF clientUI, String loginID) 
     throws IOException 
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
+    this.loginID = loginID;
     openConnection();
   }
 
@@ -118,6 +120,11 @@ public class ChatClient extends AbstractClient
 		    		clientUI.display("Your port is: " + portNum);
 		    		used = true;
 		    		break;
+		    	case "#getloginid":
+		    		String loginID2 = getLoginID();
+		    		clientUI.display("Your loginID is: " + loginID2);
+		    		used = true;
+		    		break;
 		    	default:
 		    		if (!used) {
 		    			clientUI.display("Invalid command");
@@ -174,6 +181,31 @@ public class ChatClient extends AbstractClient
 	protected void connectionException(Exception exception) {
   		clientUI.display("The server has shut down");
   		quit();
+	}
+  	
+  	public void setLoginID(String loginID) {
+  		this.loginID = loginID;
+  	}
+  	
+  	public String getLoginID() {
+  		return loginID;
+  	}
+  	
+	/**
+	 * Implements the hook method called after a connection has been established. The default
+	 * implementation does nothing. It may be overridden by subclasses to do
+	 * anything they wish.
+	 */
+  	@Override
+	protected void connectionEstablished() {
+  		try {
+	  		if(isConnected()) {
+		  		sendToServer("#login " + getLoginID());
+	  		}
+  		}
+  		catch (IOException e) {
+  			clientUI.display("Could not do action.");
+  		}
 	}
 }
 //End of ChatClient class

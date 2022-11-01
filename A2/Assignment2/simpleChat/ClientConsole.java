@@ -32,7 +32,9 @@ public class ClientConsole implements ChatIF
   /**
    * The instance of the client that created this ConsoleChat.
    */
-  ChatClient client;
+  private ChatClient client;
+  private String host;
+  private int port;
   
   
   
@@ -50,11 +52,14 @@ public class ClientConsole implements ChatIF
    * @param host The host to connect to.
    * @param port The port to connect on.
    */
-  public ClientConsole(String host, int port) 
+  public ClientConsole(String host, int port, String loginID) 
   {
     try 
     {
-      client= new ChatClient(host, port, this);
+      this.host = host;
+      this.port = port;
+      client= new ChatClient(host, port, this, loginID);
+      
       
       
     } 
@@ -72,6 +77,13 @@ public class ClientConsole implements ChatIF
   
   //Instance methods ************************************************
   
+  public String getHost() {
+	  return host;
+  }
+  
+  public int getPort() {
+	  return port;
+  }
   /**
    * This method waits for input from the console.  Once it is 
    * received, it sends it to the client's message handler.
@@ -117,14 +129,16 @@ public class ClientConsole implements ChatIF
    */
   public static void main(String[] args) 
   {
+	String loginID = "";
     String host = "";
     int port = 0;
 
 
     try
     {
-      host = args[0];
-      port = Integer.parseInt(args[1]);
+      loginID = args[0];
+      host = args[1];
+      port = Integer.parseInt(args[2]);
     }
     catch(ArrayIndexOutOfBoundsException e)
     {
@@ -135,8 +149,14 @@ public class ClientConsole implements ChatIF
         host = "localhost";
         port = DEFAULT_PORT;   	
     }
-    ClientConsole chat= new ClientConsole(host, port);
-    chat.accept();  //Wait for console data
+    if (!loginID.equals("")) {
+    	
+        ClientConsole chat = new ClientConsole(host, port, loginID);
+        chat.accept();  //Wait for console data
+    }
+    else {
+    	System.out.println("No loginID was given. Program ending");
+    }
   }
 }
 //End of ConsoleChat class
